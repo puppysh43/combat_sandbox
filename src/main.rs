@@ -9,6 +9,7 @@ mod prelude {
     pub const NUM_TILES: usize = (MAP_WIDTH * MAP_HEIGHT) as usize;
 }
 mod combat_action_type;
+mod components;
 mod gamestate;
 mod init_ecs;
 mod sound_atlas;
