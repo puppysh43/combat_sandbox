@@ -40,7 +40,7 @@ pub struct Weapon {
     ///magazine size represented as an i32. note that current ammo will be stored as a separate component
     magazine: i32,
 }
-pub enum Attribute {
+pub enum AttributeType {
     Strength,
     Dexterity,
     Endurance,
@@ -48,34 +48,66 @@ pub enum Attribute {
     Education,
     Charm,
 }
+
+pub struct AttributeValue {
+    current: i32,
+    max: i32,
+}
+impl AttributeValue {
+    pub fn current(&self) -> i32 {
+        self.current
+    }
+    pub fn max(&self) -> i32 {
+        self.max
+    }
+}
 ///component that stores the attributes of an npc inspired by mongoose traveller 2e characteristics
 pub struct Attributes {
     ///a character's natural physical strength
-    strength: i32,
+    strength: AttributeValue,
     ///a character's agility, reflexes, coordination, and fine motor control
-    dexterity: i32,
+    dexterity: AttributeValue,
     ///a character's physical stamina, determination, and ability to sustain damage
-    endurance: i32,
+    endurance: AttributeValue,
     ///a character's raw intelligence and quickness of mind - used for new information
     ///and puzzle solving
-    intelligence: i32,
+    intelligence: AttributeValue,
     ///a character's level of lifetime learning and experience especially in academics/intellectual pursuits
-    education: i32,
+    education: AttributeValue,
     ///a character's untrained charisma, social aptitude, and ability to relate to others
-    charm: i32,
+    charm: AttributeValue,
 }
 impl Attributes {
     ///gets the raw attribute score given the attribute type enum
-    pub fn get_attribute(&self, attribute: Attribute) -> i32 {
+    pub fn get_attribute(&self, attribute: AttributeType) -> i32 {
         match attribute {
-            Attribute::Strength => self.strength,
-            Attribute::Dexterity => self.dexterity,
-            Attribute::Endurance => self.endurance,
-            Attribute::Intelligence => self.intelligence,
-            Attribute::Education => self.education,
-            Attribute::Charm => self.charm,
+            AttributeType::Strength => self.strength.current,
+            AttributeType::Dexterity => self.dexterity.current,
+            AttributeType::Endurance => self.endurance.current,
+            AttributeType::Intelligence => self.intelligence.current,
+            AttributeType::Education => self.education.current,
+            AttributeType::Charm => self.charm.current,
         }
     }
     ///gets the attribute bonus of the given attribute type, used heavily for skill checks.
-    pub fn get_attribute_bonus(&self, attribute: Attribute) -> i32 {}
+    pub fn get_attribute_bonus(&self, attribute: AttributeType) -> i32 {
+        let score = self.get_attribute(attribute);
+        if score <= 0 {
+            -3
+        } else if score >= 1 && score <= 2 {
+            -2
+        } else if score >= 3 && score <= 5 {
+            -1
+        } else if score >= 6 && score <= 8 {
+            0
+        } else if score >= 9 && score <= 11 {
+            1
+        } else if score >= 12 && score <= 14 {
+            2
+        } else if score >= 15 {
+            3
+        } else {
+            0
+        }
+    }
 }
