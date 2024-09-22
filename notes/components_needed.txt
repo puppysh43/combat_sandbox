@@ -1,0 +1,49 @@
+Components from old rpg engine that will need to be ported over
+AI components
+both for out of combat and in combat.
+
+Item components
+Item tag component
+
+components for effects upon use like providing healing
+
+Carried component that is added to an item to show who/what is carrying it in their inventory
+
+Messages of Intent
+something for moving an object
+an MOI to add a message to the log
+(for general game) message of intent for wanting to enter a location on the worldmap
+
+tag component for when you want an entity to be unable to do anything
+
+///Attach this tag to an entity and it will be unable to do ANYTHING for the specified number of rounds
+pub struct UnableToAct(i32);
+
+used for the map system that I may or may not implement
+#[derive(Clone, Debug, PartialEq)]
+pub struct WantsToChangeMap {
+    pub pos: Point,
+    pub entity: Entity,
+    pub cardinal_direction: CardinalDirection,
+    pub map_pos: Point3D,
+    pub current_localmap: LocalMapID,
+}
+
+equipped item slot with an option
+
+GENERAL PURPOSE COMPONENTS
+Render component
+player tag component
+enemy component (maybe not necessary?)
+Effect tag component (used to mark something as needing to be drawn above everything else)
+name component for having a name popup as a tooltip over an entity when moused over or selected 
+short and long description (for printing to log vs opening a full screen for a multi paragraph description)
+
+component to tag something as a reticule (will need different kinds of reticules maybe idk)
+
+tag for keeping track of current localmap
+tag to mark an entity as being currently examined
+
+FOV related components (current field of view struct is based on bracketlib implementation but look into implementing my own shadowcasting)
+
+SOME kind of lighting system to be implemented much much later
