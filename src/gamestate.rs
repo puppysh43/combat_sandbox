@@ -1,5 +1,6 @@
 use crate::combat_action_type::*;
 use crate::init_ecs::*;
+use crate::map::*;
 use crate::prelude::*;
 use crate::sound_atlas::*;
 use crate::texture_atlas::*;
@@ -12,26 +13,28 @@ pub struct GameState {
     pub ecs: World,
     pub turn_state: TurnState,
     pub control_state: CombatActionType,
-    //map: Map,//temporary just for testing combat.
-    //player: Entity //will be needed in full game
+    pub map: Map, //temporary just for testing combat.
     pub log: Vec<String>,
     pub number_turns: i32,
     pub quitting: bool,
-    //ui_state: UiState,
+    pub event_queue: Vec<GameEvent>, //ui_state: UiState,
 }
 
 impl GameState {
     pub async fn default() -> Self {
         let log: Vec<String> = Vec::new();
+        let event_queue: Vec<GameEvent> = Vec::new();
         Self {
             texture_atlas: crate::texture_atlas::make().await,
             sound_atlas: crate::sound_atlas::make().await,
             ecs: crate::init_ecs::init_ecs(),
             turn_state: TurnState::PlayerOne,
             control_state: CombatActionType::None,
+            map: Map::new(),
             log,
             number_turns: 0,
             quitting: false,
+            event_queue,
         }
     }
 }
@@ -40,4 +43,7 @@ impl GameState {
 pub enum TurnState {
     PlayerOne,
     PlayerTwo,
+}
+pub enum GameEvent {
+    EntityMoved,
 }

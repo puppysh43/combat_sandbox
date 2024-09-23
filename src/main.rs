@@ -7,11 +7,15 @@ mod prelude {
     pub const MAP_HEIGHT: i32 = 33;
     pub use std::collections::HashMap;
     pub const NUM_TILES: usize = (MAP_WIDTH * MAP_HEIGHT) as usize;
+    pub use crate::components::*;
+    pub use crate::gamestate::*;
 }
 mod combat_action_type;
+mod combat_systems;
 mod components;
 mod gamestate;
 mod init_ecs;
+mod map;
 mod sound_atlas;
 mod texture_atlas;
 
@@ -38,10 +42,12 @@ fn window_conf() -> macroquad::conf::Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
+    //do all the on gamelaunch setup here
     let mut gamestate = GameState::default().await;
 
     loop {
         //do stuff
+        combat_systems::run(&mut gamestate);
         if gamestate.quitting {
             break;
         }
