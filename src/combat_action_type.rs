@@ -20,7 +20,7 @@ pub enum CombatActionType {
     ///User will open up a menu about if they want to draw/holster and what item
     Drawing,
     ///user will reload their current weapon if applicable otherwise it will do nothing
-    Reloading,
+    // Reloading,//may not actually need this one
     ///user will be able to move the character with the cursor keys for a limited amount of moves
     Movement,
     ///if user is not currently grappling they will be able to choose a direction [if needed] of who to try and grapple
@@ -37,7 +37,7 @@ pub enum CombatActionType {
     PickUp,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Copy, Clone, Debug, PartialEq)]
 pub enum UseItemState {
     Selecting,
     Using,

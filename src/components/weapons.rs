@@ -1,4 +1,3 @@
-
 ///A collection of misc. effects that can be given to weapons to represent various features
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum WeaponTrait {
@@ -99,3 +98,7 @@ pub struct Weapon {
     magazine: i32,
     //magazine_cost: i32,
 }
+
+///Component for when a weapon is loaded with ammo
+pub struct CurrentAmmo(i32);
+impl CurrentAmmo {}

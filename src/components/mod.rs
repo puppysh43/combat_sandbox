@@ -1,6 +1,7 @@
 mod moi;
 mod rpg_components;
 mod weapons;
+pub use moi::*;
 pub use rpg_components::*;
 pub use weapons::*;
 
@@ -103,10 +104,28 @@ impl CombatEncounter {
     }
 }
 
-// pub struct ActionPoints(i32);
-// impl ActionPoints {
-// pub fn new()
-// }
+///Component that holds
+pub struct ActionPoints(i32);
+impl ActionPoints {
+    pub fn new() -> Self {
+        Self(3)
+    }
+    pub fn significant_action(&mut self) {
+        self.0 -= 2;
+    }
+    pub fn minor_action(&mut self) {
+        self.0 -= 1;
+    }
+    pub fn full_turn(&mut self) {
+        self.0 -= 3;
+    }
+    pub fn reset(&mut self) {
+        self.0 = 3;
+    }
+    pub fn get(&self) -> i32 {
+        self.0
+    }
+}
 
 ///Enum that determines what kind of cover something is. Note this doesn't effect how much of a defensive bonus
 ///the cover gives but rather what stance a character needs to be to benefit from the cover

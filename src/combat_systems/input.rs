@@ -1,6 +1,7 @@
 use super::CombatEncounter;
 use crate::combat_action_type::*;
 use crate::gamestate::*;
+use crate::prelude::*;
 use hecs::*;
 use macroquad::prelude::*;
 
@@ -12,6 +13,10 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
             //choose to do a ranged attack
             if is_key_pressed(KeyCode::F) {
                 state.control_state = CombatActionType::RangedAttack;
+            }
+            //reload
+            if is_key_pressed(KeyCode::R) {
+                state.ecs.spawn((MOIReload::new(active_entity),));
             }
         }
         CombatActionType::RangedAttack => {
@@ -32,10 +37,6 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
         CombatActionType::Drawing => {
             //this one will be a pain in the ass will need a menu and different options and all that bullshit
         }
-        CombatActionType::Reloading => {
-            //wait I don't actually know if I'll need this control state I can just have selecting
-            //the reloading option in the root controlstate send out a reload MOI
-        }
         CombatActionType::Movement => {
             //
         }
@@ -46,7 +47,7 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
             //this one will probably go unused for a while
         }
         CombatActionType::UseItem(useitemstate) => {
-            match useitemstate {
+            match &useitemstate {
                 UseItemState::Selecting => {
                     //
                 }
