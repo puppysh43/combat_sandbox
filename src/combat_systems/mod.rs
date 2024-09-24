@@ -13,8 +13,12 @@ pub fn run(state: &mut GameState) {
     //MVP for testing proof of concept
     //it will allow the user to have a field of characters that it will alternate between and allow JUST movement
     //printing to the console how many action points are left, what round it is, who's turn it is, etc
-    input::system(state, &mut combat_encounter);
 
+    //first get the player's input and get MOIs put into the ecs
+    input::system(state, &mut combat_encounter);
+    //then process those MOIs and do other systems
+    //
+    //then render the gamestate onto the screen
     update_combat_encounter(state, combat_encounter);
 }
 ///Helper function that returns the current Combat Encounter in the ECS

@@ -45,16 +45,16 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
         CombatActionType::Interact => {
             //this one will probably go unused for a while
         }
-        CombatActionType::UseItem(useitemstate) => {
-            match useitemstate {
-                UseItemState::Selecting => {
-                    //
-                }
-                UseItemState::Using => {
-                    //
-                }
-            }
-        }
+        // CombatActionType::UseItem(useitemstate) => {
+        // match useitemstate {
+        // UseItemState::Selecting => {
+
+        // }
+        // UseItemState::Using => {
+
+        // }
+        // }
+        // }
         CombatActionType::Look => {
             //player can move reticule, press enter to get a short description printed to the log, or use shift enter to get a detailed description
             //including identifying equipment but using 1AP in the process

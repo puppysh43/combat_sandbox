@@ -30,7 +30,7 @@ pub enum CombatActionType {
     ///OR if needed specifying a direction
     Interact,
     ///todo later
-    UseItem(UseItemState),
+    // UseItem(UseItemState),
     ///todo later
     Look,
     ///todo later
