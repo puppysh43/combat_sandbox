@@ -9,6 +9,8 @@ use hecs::*;
 use macroquad::prelude::*;
 //this is the big mod file for components that will expand as I add more components
 
+///tag component to mark an entity as a reticule owned by a particular character
+pub struct Reticule(Entity);
 ///Component that allows an entity to be rendered, contains the hashmap key needed to retrieve
 ///the necessary Texture2D from the texture atlas
 #[derive(Clone, Debug)]
@@ -22,7 +24,7 @@ impl Renderable {
 }
 ///Newtype wrapper around a 2D vector integer used for tracking the location of tile-map entities on the screen
 ///(this will be basically everything except for effects)
-pub struct GridPosition(IVec2);
+// pub struct GridPosition(IVec2);
 
 ///This enum will be used in this sandbox simply for determining which team someone is on but in the future
 ///will be used for determining who in combat is controlled by the player and who by AI
@@ -104,24 +106,35 @@ impl CombatEncounter {
     }
 }
 
-///Component that holds
+///An entity's action points used for the turn based combat system
 pub struct ActionPoints(i32);
 impl ActionPoints {
     pub fn new() -> Self {
         Self(3)
     }
-    pub fn significant_action(&mut self) {
-        self.0 -= 2;
+    ///Reduces the action points by the 2AP that a significant action costs if possible
+    ///otherwise just returns the current amount of action points
+    pub fn significant_action(&mut self) -> Result<i32, i32> {
+        if self.get() <= 2 {
+            self.0 -= 2;
+            Ok(self.get())
+        } else {
+            Err(self.get())
+        }
     }
+    ///Reduces the action points by the 1AP that a minor action costs
     pub fn minor_action(&mut self) {
         self.0 -= 1;
     }
+    ///consumes all of the character's action points at once
     pub fn full_turn(&mut self) {
         self.0 -= 3;
     }
+    ///Resets the Action Points back to the start/default
     pub fn reset(&mut self) {
         self.0 = 3;
     }
+    ///provides how many action points are currently left
     pub fn get(&self) -> i32 {
         self.0
     }
@@ -159,3 +172,28 @@ pub enum Stance {
 
 ///tag component that points to a weapon and marks it as equipped by an entity that has this component
 pub struct EquippedRangedWeapon(Entity);
+
+///Component assigned to an entity when it's in the moving phase,
+pub struct MovementPoints {
+    max: i32,
+    current: i32,
+}
+impl MovementPoints {
+    ///create a custom amount of movement points for non-standard enemies
+    pub fn new(max: i32) -> Self {
+        Self { max, current: max }
+    }
+    ///create the movement point component for a standard humanoid character (4 tiles or 6 meters)
+    pub fn default() -> Self {
+        Self { max: 3, current: 3 }
+    }
+    ///reduces the movement points by one. used every time an entity moves. an entity will never
+    ///consume more than one movement point at a time
+    pub fn decrement(&mut self) {
+        self.current -= 1;
+    }
+    ///reset the current movement points (done at the beginning of an entity initiating their action)
+    pub fn reset(&mut self) {
+        self.current = self.max;
+    }
+}
