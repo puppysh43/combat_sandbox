@@ -1,4 +1,6 @@
 mod input;
+mod movement;
+mod render;
 
 use crate::prelude::*;
 use hecs::*;
@@ -16,8 +18,9 @@ pub fn run(state: &mut GameState) {
     //first get the player's input and get MOIs put into the ecs
     input::system(state, &mut combat_encounter);
     //then process those MOIs and do other systems
-    //
+    movement::system(state);
     //then render the gamestate onto the screen
+    render::system(state);
     update_combat_encounter(state, combat_encounter);
 }
 ///Helper function that returns the current Combat Encounter in the ECS

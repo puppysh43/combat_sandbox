@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use macroquad::prelude::*;
 
 #[derive(Copy, Clone, PartialEq, Debug)]
 pub enum TileType {

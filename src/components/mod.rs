@@ -18,6 +18,9 @@ pub struct Renderable {
     sprite: String,
 }
 impl Renderable {
+    pub fn new(sprite: String) -> Self {
+        Self { sprite }
+    }
     pub fn get_sprite(&self) -> String {
         self.sprite.clone()
     }
@@ -197,3 +200,6 @@ impl MovementPoints {
         self.current = self.max;
     }
 }
+
+///tag component that marks an entity as being collideable aka other entities can't enter the same square as it
+pub struct Collideable;

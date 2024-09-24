@@ -26,6 +26,11 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
             if is_key_pressed(KeyCode::S) {
                 state.control_state = CombatActionType::Movement;
             }
+            if is_key_down(KeyCode::LeftShift) && is_key_pressed(KeyCode::Q)
+                || is_key_down(KeyCode::RightShift) && is_key_pressed(KeyCode::Q)
+            {
+                state.quitting = true;
+            }
         }
         CombatActionType::RangedAttack => {
             //ranged attack code goes here [move reticule MOI or send ranged attack MOI]

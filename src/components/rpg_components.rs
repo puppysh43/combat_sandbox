@@ -26,6 +26,33 @@ pub struct Attributes {
     charm: AttributeValue,
 }
 impl Attributes {
+    pub fn new(
+        strength: i32,
+        dexterity: i32,
+        endurance: i32,
+        intelligence: i32,
+        education: i32,
+        charm: i32,
+    ) -> Self {
+        Self {
+            strength: AttributeValue::new(strength),
+            dexterity: AttributeValue::new(dexterity),
+            endurance: AttributeValue::new(endurance),
+            intelligence: AttributeValue::new(intelligence),
+            education: AttributeValue::new(education),
+            charm: AttributeValue::new(charm),
+        }
+    }
+    pub fn default() -> Self {
+        Self {
+            strength: AttributeValue::new(7),
+            dexterity: AttributeValue::new(7),
+            endurance: AttributeValue::new(7),
+            intelligence: AttributeValue::new(7),
+            education: AttributeValue::new(7),
+            charm: AttributeValue::new(7),
+        }
+    }
     ///provides an attribute given the attribute type enum to then have further data specified out of it
     pub fn attribute(&self, attribute: AttributeType) -> &AttributeValue {
         match attribute {
@@ -56,6 +83,12 @@ pub struct AttributeValue {
     max: i32,
 }
 impl AttributeValue {
+    pub fn new(value: i32) -> Self {
+        Self {
+            current: value,
+            max: value,
+        }
+    }
     ///gets the current value of the given attribute. Used for almost all circumstances
     ///the game checks the attribute's value
     pub fn current(&self) -> i32 {

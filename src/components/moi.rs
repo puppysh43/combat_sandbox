@@ -14,6 +14,7 @@ impl MOIReload {
     }
 }
 
+#[derive(Copy, Clone, Debug)]
 pub struct MOIWantsToMove {
     collision: bool,
     entity: Entity,

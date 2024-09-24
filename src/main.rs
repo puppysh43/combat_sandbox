@@ -4,7 +4,7 @@ mod prelude {
     //fullscreen size is 60 tiles wide and 33.75 tiles tall
     //max screen size of 60/33 tiles with 12 pixels at the top and bottom as a buffer (or 24 at the top/bottom of the screen for text)
     pub const MAP_WIDTH: i32 = 45;
-    pub const MAP_HEIGHT: i32 = 33;
+    pub const MAP_HEIGHT: i32 = 32;
     pub use std::collections::HashMap;
     pub const NUM_TILES: usize = (MAP_WIDTH * MAP_HEIGHT) as usize;
     pub use crate::components::*;
@@ -45,11 +45,14 @@ async fn main() {
     //do all the on gamelaunch setup here
     let mut gamestate = GameState::default().await;
 
+    //this is the actual gameloop for right now
     loop {
-        //do stuff
+        //run all the game systems
         combat_systems::run(&mut gamestate);
+        //quit if the player wants to quit
         if gamestate.quitting {
             break;
         }
+        next_frame().await;
     }
 }
