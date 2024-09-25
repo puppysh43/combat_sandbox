@@ -177,6 +177,7 @@ pub enum Stance {
 pub struct EquippedRangedWeapon(Entity);
 
 ///Component assigned to an entity when it's in the moving phase,
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct MovementPoints {
     max: i32,
     current: i32,
@@ -198,6 +199,14 @@ impl MovementPoints {
     ///reset the current movement points (done at the beginning of an entity initiating their action)
     pub fn reset(&mut self) {
         self.current = self.max;
+    }
+    ///checks if there's any movement points left
+    pub fn can_move(&self) -> bool {
+        if self.current > 0 {
+            true
+        } else {
+            false
+        }
     }
 }
 
