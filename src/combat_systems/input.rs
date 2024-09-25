@@ -25,6 +25,7 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
             //choose to start moving
             if is_key_pressed(KeyCode::S) {
                 state.control_state = CombatActionType::Movement;
+                println!("character has decided to move");
             }
             if is_key_down(KeyCode::LeftShift) && is_key_pressed(KeyCode::Q)
                 || is_key_down(KeyCode::RightShift) && is_key_pressed(KeyCode::Q)
@@ -65,6 +66,7 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
                         pos.unwrap().y + delta.unwrap().y,
                     ),
                 ),));
+                println!("produced an MOI");
             }
         }
         CombatActionType::Grapple => {

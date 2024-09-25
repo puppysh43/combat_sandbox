@@ -208,6 +208,10 @@ impl MovementPoints {
             false
         }
     }
+    ///returns the current amount of movement points
+    pub fn current(&self) -> i32 {
+        self.current
+    }
 }
 
 ///tag component that marks an entity as being collideable aka other entities can't enter the same square as it

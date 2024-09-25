@@ -39,7 +39,9 @@ pub fn system(state: &mut GameState) {
         //if the character has a movement point component then you need to check if they have enough
         if movement_points.is_some() {
             can_move = movement_points.unwrap().can_move();
+            println!("entity has the movement points to move");
         }
+        println!("can_move:{}", can_move);
         //only let them move if they actually can move
         if can_move {
             //check if the entity moving has collision (ex. characters do but reticules don't)
@@ -63,6 +65,8 @@ pub fn system(state: &mut GameState) {
                     //if the entity wouldn't be colliding with any other entity then it's okay to move them!
                     if !collides {
                         cmd_buffer.insert(entity, (destination,));
+                        cmd_buffer.run_on(&mut state.ecs);
+                        println!("tried to move entity!");
                         has_moved = true;
                     }
                 }
@@ -77,10 +81,15 @@ pub fn system(state: &mut GameState) {
             //finally, if the character has moved a tile, then if applicable consume one of their movement points
             if has_moved && movement_points.is_some() {
                 movement_points.unwrap().decrement();
+                cmd_buffer.insert(entity, (movement_points.unwrap(),));
+                cmd_buffer.run_on(&mut state.ecs);
+                println!("decremented the movement points of the moving entity!");
+                println!(
+                    "movement points left: {}",
+                    movement_points.unwrap().current()
+                )
             }
             //then update the movement points component of the entity that's moving
-            cmd_buffer.insert(entity, (movement_points.unwrap(),));
-            cmd_buffer.run_on(&mut state.ecs);
         } else {
             println!("doesn't have enough movement points to move!");
         }
