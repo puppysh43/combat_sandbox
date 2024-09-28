@@ -1,6 +1,3 @@
-/*
-needs to add checking movement points and decrementing them when the entity moves!!! This is basically the last thing I think.
-*/
 use crate::prelude::*;
 use hecs::*;
 use macroquad::prelude::*;
@@ -28,21 +25,24 @@ pub fn system(state: &mut GameState) {
         //check if the entity has a pool of movement points (like all PCs and NPCs will) and make sure they have enough
         let mut movement_points: Option<MovementPoints> = None;
         if state.ecs.entity(entity).is_ok() {
-            if state.ecs.entity(entity).unwrap().has::<&MovementPoints>() {
-                for mp_comp in state.ecs.query_one_mut::<&MovementPoints>(entity) {
-                    movement_points = Some(mp_comp.clone());
-                }
+            println!("the entity is valid."); //this one prints
+                                              // if state.ecs.entity(entity).unwrap().has::<&MovementPoints>() {
+                                              // println!("the entity has the movement points component"); //this doesn't print
+            for mp_comp in state.ecs.query_one_mut::<&MovementPoints>(entity) {
+                movement_points = Some(mp_comp.clone());
+                println!("extracting the movement points component"); //this one prints now after commenting out the above
             }
+            // }
         }
 
         let mut can_move = true;
         //if the character has a movement point component then you need to check if they have enough
         if movement_points.is_some() {
             can_move = movement_points.unwrap().can_move();
-            println!("entity has the movement points to move");
+            println!("entity has the movement points to move"); //this doesn't print
         }
-        println!("can_move:{}", can_move);
-        //only let them move if they actually can move
+        println!("can_move:{}", can_move); //this does print and as true
+                                           //only let them move if they actually can move
         if can_move {
             //check if the entity moving has collision (ex. characters do but reticules don't)
             if collision {
@@ -66,7 +66,6 @@ pub fn system(state: &mut GameState) {
                     if !collides {
                         cmd_buffer.insert(entity, (destination,));
                         cmd_buffer.run_on(&mut state.ecs);
-                        println!("tried to move entity!");
                         has_moved = true;
                     }
                 }
@@ -79,6 +78,11 @@ pub fn system(state: &mut GameState) {
                 }
             }
             //finally, if the character has moved a tile, then if applicable consume one of their movement points
+            println!(
+                "has moved:{}, movement_points.is_some(): {}",
+                has_moved,
+                movement_points.is_some(),
+            );
             if has_moved && movement_points.is_some() {
                 movement_points.unwrap().decrement();
                 cmd_buffer.insert(entity, (movement_points.unwrap(),));
