@@ -8,15 +8,40 @@ use macroquad::prelude::*;
 pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
     //first check with the combat encounter to see which entity/character is being currently controlled
     let active_entity = combat_encounter.next_turn().unwrap();
+    //make an option to hold the queried action points
+    let mut action_points_query: Option<ActionPoints> = None;
+    for ap in state.ecs.query_one_mut::<&ActionPoints>(active_entity) {
+        action_points_query = Some(*ap);
+    }
+    let mut action_points = action_points_query.unwrap();
+
     match state.control_state {
         CombatActionType::None => {
             //choose to do a ranged attack
             if is_key_pressed(KeyCode::F) {
-                state.control_state = CombatActionType::RangedAttack;
+                match action_points.significant_action() {
+                    Ok(ap_left) => {
+                        state.control_state = CombatActionType::RangedAttack;
+                        println!(
+                            "[Entity Name] has decided to attack and now has {} AP left!",
+                            ap_left
+                        );
+                    }
+                    Err(ap_left) => {
+                        println!("[Entity Name] doesn't have enough action points to make a ranged attack, only has {} AP!", ap_left);
+                    }
+                }
             }
             //reload
             if is_key_pressed(KeyCode::R) {
-                state.ecs.spawn((MOIReload::new(active_entity),));
+                match action_points.minor_action() {
+                    Ok(ap_left) => {
+                        state.ecs.spawn((MOIReload::new(active_entity),));
+                    }
+                    Err(ok_left) => {
+                        //
+                    }
+                }
             }
             //choose to aim at an enemy
             if is_key_pressed(KeyCode::A) {

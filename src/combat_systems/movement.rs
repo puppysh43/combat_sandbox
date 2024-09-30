@@ -23,13 +23,13 @@ pub fn system(state: &mut GameState) {
         //deconstruct the current message of intent
         let (collision, entity, destination) = moi.get();
         //check if the entity has a pool of movement points (like all PCs and NPCs will) and make sure they have enough
-        let mut movement_points: Option<MovementPoints> = None;
+        let mut movement_points_option: Option<MovementPoints> = None;
         if state.ecs.entity(entity).is_ok() {
             println!("the entity is valid."); //this one prints
                                               // if state.ecs.entity(entity).unwrap().has::<&MovementPoints>() {
                                               // println!("the entity has the movement points component"); //this doesn't print
             for mp_comp in state.ecs.query_one_mut::<&MovementPoints>(entity) {
-                movement_points = Some(mp_comp.clone());
+                movement_points_option = Some(mp_comp.clone());
                 println!("extracting the movement points component"); //this one prints now after commenting out the above
             }
             // }
@@ -37,8 +37,8 @@ pub fn system(state: &mut GameState) {
 
         let mut can_move = true;
         //if the character has a movement point component then you need to check if they have enough
-        if movement_points.is_some() {
-            can_move = movement_points.unwrap().can_move();
+        if movement_points_option.is_some() {
+            can_move = movement_points_option.unwrap().can_move();
             println!("entity has the movement points to move"); //this doesn't print
         }
         println!("can_move:{}", can_move); //this does print and as true
@@ -78,20 +78,12 @@ pub fn system(state: &mut GameState) {
                 }
             }
             //finally, if the character has moved a tile, then if applicable consume one of their movement points
-            println!(
-                "has moved:{}, movement_points.is_some(): {}",
-                has_moved,
-                movement_points.is_some(),
-            );
-            if has_moved && movement_points.is_some() {
-                movement_points.unwrap().decrement();
-                cmd_buffer.insert(entity, (movement_points.unwrap(),));
+            if has_moved && movement_points_option.is_some() {
+                let mut movement_points = movement_points_option.unwrap();
+                movement_points.decrement();
+                cmd_buffer.insert(entity, (movement_points,));
                 cmd_buffer.run_on(&mut state.ecs);
-                println!("decremented the movement points of the moving entity!");
-                println!(
-                    "movement points left: {}",
-                    movement_points.unwrap().current()
-                )
+                println!("current movement points: {}", movement_points.current());
             }
             //then update the movement points component of the entity that's moving
         } else {

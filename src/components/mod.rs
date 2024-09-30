@@ -110,6 +110,7 @@ impl CombatEncounter {
 }
 
 ///An entity's action points used for the turn based combat system
+#[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub struct ActionPoints(i32);
 impl ActionPoints {
     pub fn new() -> Self {
@@ -118,16 +119,21 @@ impl ActionPoints {
     ///Reduces the action points by the 2AP that a significant action costs if possible
     ///otherwise just returns the current amount of action points
     pub fn significant_action(&mut self) -> Result<i32, i32> {
-        if self.get() <= 2 {
+        if self.0 <= 2 {
             self.0 -= 2;
-            Ok(self.get())
+            Ok(self.0)
         } else {
-            Err(self.get())
+            Err(self.0)
         }
     }
     ///Reduces the action points by the 1AP that a minor action costs
-    pub fn minor_action(&mut self) {
-        self.0 -= 1;
+    pub fn minor_action(&mut self) -> Result<i32, i32> {
+        if self.0 <= 1 {
+            self.0 -= 1;
+            Ok(self.0)
+        } else {
+            Err(self.0)
+        }
     }
     ///consumes all of the character's action points at once
     pub fn full_turn(&mut self) {
