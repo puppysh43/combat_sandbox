@@ -15,6 +15,7 @@ mod combat_systems;
 mod components;
 mod gamestate;
 mod init_ecs;
+mod lib;
 mod map;
 mod sound_atlas;
 mod texture_atlas;

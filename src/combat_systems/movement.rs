@@ -25,24 +25,17 @@ pub fn system(state: &mut GameState) {
         //check if the entity has a pool of movement points (like all PCs and NPCs will) and make sure they have enough
         let mut movement_points_option: Option<MovementPoints> = None;
         if state.ecs.entity(entity).is_ok() {
-            println!("the entity is valid."); //this one prints
-                                              // if state.ecs.entity(entity).unwrap().has::<&MovementPoints>() {
-                                              // println!("the entity has the movement points component"); //this doesn't print
             for mp_comp in state.ecs.query_one_mut::<&MovementPoints>(entity) {
                 movement_points_option = Some(mp_comp.clone());
-                println!("extracting the movement points component"); //this one prints now after commenting out the above
             }
-            // }
         }
 
         let mut can_move = true;
         //if the character has a movement point component then you need to check if they have enough
         if movement_points_option.is_some() {
             can_move = movement_points_option.unwrap().can_move();
-            println!("entity has the movement points to move"); //this doesn't print
         }
-        println!("can_move:{}", can_move); //this does print and as true
-                                           //only let them move if they actually can move
+        //only let them move if they actually can move
         if can_move {
             //check if the entity moving has collision (ex. characters do but reticules don't)
             if collision {
@@ -82,12 +75,17 @@ pub fn system(state: &mut GameState) {
                 let mut movement_points = movement_points_option.unwrap();
                 movement_points.decrement();
                 cmd_buffer.insert(entity, (movement_points,));
+                cmd_buffer.spawn((GameLogMessage::new(format!(
+                    "current movement points: {}",
+                    movement_points.current()
+                )),));
                 cmd_buffer.run_on(&mut state.ecs);
-                println!("current movement points: {}", movement_points.current());
             }
             //then update the movement points component of the entity that's moving
         } else {
-            println!("doesn't have enough movement points to move!");
+            cmd_buffer.spawn((GameLogMessage::new(String::from(
+                "Doesn't have enough movement points to move",
+            )),));
         }
     }
 }

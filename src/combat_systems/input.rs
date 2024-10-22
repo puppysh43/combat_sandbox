@@ -26,6 +26,7 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
                             "[Entity Name] has decided to attack and now has {} AP left!",
                             ap_left
                         );
+                        //spawn in a reticule
                     }
                     Err(ap_left) => {
                         println!("[Entity Name] doesn't have enough action points to make a ranged attack, only has {} AP!", ap_left);
@@ -38,7 +39,7 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
                     Ok(ap_left) => {
                         state.ecs.spawn((MOIReload::new(active_entity),));
                     }
-                    Err(ok_left) => {
+                    Err(ap_left) => {
                         //
                     }
                 }
@@ -49,13 +50,29 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
             }
             //choose to start moving
             if is_key_pressed(KeyCode::S) {
-                state.control_state = CombatActionType::Movement;
-                println!("character has decided to move");
+                match action_points.minor_action() {
+                    Ok(ap_left) => {
+                        state.control_state = CombatActionType::Movement;
+
+                        println!("character has decided to move");
+                    }
+                    Err(ap_left) => {
+                        //
+                    }
+                }
+            }
+            //change stance
+            if is_key_pressed(KeyCode::C) {
+                state.control_state = CombatActionType::ChangingStance;
+                println!("character is changing stance.");
             }
             if is_key_down(KeyCode::LeftShift) && is_key_pressed(KeyCode::Q)
                 || is_key_down(KeyCode::RightShift) && is_key_pressed(KeyCode::Q)
             {
                 state.quitting = true;
+            }
+            if is_key_pressed(KeyCode::Enter) {
+                state.control_state = CombatActionType::EndTurn;
             }
         }
         CombatActionType::RangedAttack => {
@@ -77,6 +94,12 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
             //this one will be a pain in the ass will need a menu and different options and all that bullshit
         }
         CombatActionType::Movement => {
+            if is_key_pressed(KeyCode::Escape) {
+                println!("character is ending their movement");
+                state.control_state = CombatActionType::None;
+                //need to refresh the active entity's movement points
+                crate::lib::systems::refresh_mp(state, active_entity);
+            }
             let delta = get_delta();
             if delta.is_some() {
                 let mut pos: Option<IVec2> = None;
@@ -116,6 +139,15 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
         }
         CombatActionType::PickUp => {
             //this one also may not need to be its own control state we shall see
+        }
+        CombatActionType::EndTurn => {
+            //use y or n to confirm or deny if the player actually wants to end turn.
+            if is_key_pressed(KeyCode::Y) {
+                state.ecs.spawn((MOIEndTurn,));
+            }
+            if is_key_pressed(KeyCode::N) {
+                state.control_state = CombatActionType::None;
+            }
         }
     }
 }
