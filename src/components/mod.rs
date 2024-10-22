@@ -222,3 +222,13 @@ impl MovementPoints {
 
 ///tag component that marks an entity as being collideable aka other entities can't enter the same square as it
 pub struct Collideable;
+
+pub struct Name(String);
+impl Name {
+    pub fn new(name: String) -> Self {
+        Self(name)
+    }
+    pub fn get(&self) -> String {
+        self.0.clone()
+    }
+}

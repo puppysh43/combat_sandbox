@@ -38,14 +38,22 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
                     Ok(ap_left) => {
                         state.ecs.spawn((MOIReload::new(active_entity),));
                     }
-                    Err(ok_left) => {
+                    Err(ap_left) => {
                         //
                     }
                 }
             }
             //choose to aim at an enemy
             if is_key_pressed(KeyCode::A) {
-                state.control_state = CombatActionType::Aiming;
+                match action_points.minor_action() {
+                    Ok(ap_left) => {
+                        state.control_state = CombatActionType::Aiming;
+                        //spawn in a reticule
+                    }
+                    Err(ap_left) => {
+                        //
+                    }
+                }
             }
             //choose to start moving
             if is_key_pressed(KeyCode::S) {
@@ -91,7 +99,10 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
                         pos.unwrap().y + delta.unwrap().y,
                     ),
                 ),));
-                println!("produced an MOI");
+            }
+            //esc is used to stop moving when the user is done
+            if is_key_pressed(KeyCode::Escape) {
+                state.control_state = CombatActionType::None;
             }
         }
         CombatActionType::Grapple => {
