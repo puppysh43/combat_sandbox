@@ -35,6 +35,8 @@ pub enum CombatActionType {
     Look,
     ///todo later
     PickUp,
+    ///Control for when a player wants to end their turn.
+    EndTurn,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]

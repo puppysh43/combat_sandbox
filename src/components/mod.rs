@@ -59,6 +59,7 @@ impl CombatEncounter {
             num_rounds: 0,
         }
     }
+
     ///Returns the entity ID of the next character in the initiative order to go.
     pub fn next_turn(&self) -> Option<Entity> {
         //iterate through all the entities in the combat encounter and return the entity id of the first one that hasn't been marked
@@ -76,10 +77,10 @@ impl CombatEncounter {
         //iterate through the initiative order
         for (_entity, mut completed_turn) in self.initiative_order.iter_mut() {
             //when you find the first one that hasn't completed their turn mark it as complete
-            //and then end the function
             if !completed_turn {
                 completed_turn = true;
-                return;
+                //break out of the loop so that only one is marked as complete!
+                break;
             }
         }
         //finally check to see if every entity in the initiative order has completed their turn and if so
@@ -230,5 +231,24 @@ impl Name {
     }
     pub fn get(&self) -> String {
         self.0.clone()
+    }
+}
+///Component spawned to add a string to debug log used to track game/engine behavior
+///that can be displayed if a flag is set
+//this structure allows us to be agnostic about how these messages are displayed or handled in the engine
+pub struct DebugLogMessage(pub String);
+
+impl DebugLogMessage {
+    pub fn new(contents: String) -> Self {
+        Self(contents)
+    }
+}
+///Component spawned to add a string to the game log that will be displayed in the UI
+//this structure allows us to handle the game log different ways as the engine evolves
+pub struct GameLogMessage(pub String);
+
+impl GameLogMessage {
+    pub fn new(contents: String) -> Self {
+        Self(contents)
     }
 }

@@ -32,3 +32,5 @@ impl MOIWantsToMove {
         (self.collision, self.entity, self.destination)
     }
 }
+///Simple message component for communicating that the current character wants to end their turn
+pub struct MOIEndTurn;
