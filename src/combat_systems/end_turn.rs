@@ -19,14 +19,21 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
         state
             .ecs
             .spawn((DebugLogMessage::new(String::from("completing entity turn")),));
+        let mut round_has_completed = false;
+        let mut entities_in_combat: Vec<Entity> = Vec::new();
         for (_id, combat_encounter) in state.ecs.query_mut::<&mut CombatEncounter>() {
-            combat_encounter.complete_turn();
+            round_has_completed = combat_encounter.complete_turn();
+            entities_in_combat = combat_encounter.get_all_entities();
+        }
+        if round_has_completed {
+            //if the round has completed then refresh the AP of all entities in the combat encounter
+            for entity in entities_in_combat.iter() {
+                for ap in state.ecs.query_one_mut::<&mut ActionPoints>(entity.clone()) {
+                    ap.reset();
+                }
+            }
+            //additionally in the future when a round has been completed an event will be sent into the ECS to be processed by any entity that
+            //has a round limit, such as smoke from a smoke grenade
         }
     }
 }
-/*
-                cmd_buffer.spawn((GameLogMessage::new(format!(
-                    "current movement points: {}",
-                    movement_points.current()
-                )),));
-*/

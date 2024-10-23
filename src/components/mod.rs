@@ -72,24 +72,27 @@ impl CombatEncounter {
         return None;
     }
     ///Used to mark a character's turn in the initiative order as complete. By default done whenever a character uses up
-    ///all of their Action Points
-    pub fn complete_turn(&mut self) {
+    ///all of their Action Points. Returns a bool that expresses whether the turn being completed also completes a full round
+    ///expressing to other game systems that stuff like action points needs to be refreshed and other misc systems
+    ///(eg. poison gas that lingers for 3 rounds)
+    pub fn complete_turn(&mut self) -> bool {
         //iterate through the initiative order
-        for (_entity, mut completed_turn) in self.initiative_order.iter_mut() {
+        for (entity, completed_turn) in self.initiative_order.iter_mut() {
             //when you find the first one that hasn't completed their turn mark it as complete
-            if !completed_turn {
-                completed_turn = true;
+            if !*completed_turn {
+                *completed_turn = true;
                 //break out of the loop so that only one is marked as complete!
                 break;
             }
         }
+
         //finally check to see if every entity in the initiative order has completed their turn and if so
         //reset every entity in the initiative order to having not completed
-        self.complete_round();
+        self.check_round_completion()
     }
     ///Used to complete a round, ticking up the number of rounds and resetting every entity in the initiative order to being marked
-    ///as having not gone yet.
-    pub fn complete_round(&mut self) {
+    ///as having not gone yet. Returns a bool to express if the round has been completed or not.
+    pub fn check_round_completion(&mut self) -> bool {
         //flag for completion automatically set to true
         let mut is_complete = true;
         //iterate through the initiative order to make sure everyone has completed their turn.
@@ -103,10 +106,21 @@ impl CombatEncounter {
         //back to the beginning where no one has gone yet.
         if is_complete {
             self.num_rounds += 1;
-            for (_entity, mut completed_turn) in self.initiative_order.iter_mut() {
-                completed_turn = false;
+            for (_entity, completed_turn) in self.initiative_order.iter_mut() {
+                *completed_turn = false;
             }
+            return true;
+        } else {
+            return false;
         }
+    }
+    ///returns all of the entities in the combat encounter in initiative order.
+    pub fn get_all_entities(&self) -> Vec<Entity> {
+        let mut all_entities: Vec<Entity> = Vec::new();
+        for (entity_id, _has_completed) in self.initiative_order.iter() {
+            all_entities.push(entity_id.clone());
+        }
+        all_entities
     }
 }
 
@@ -120,7 +134,7 @@ impl ActionPoints {
     ///Reduces the action points by the 2AP that a significant action costs if possible
     ///otherwise just returns the current amount of action points
     pub fn significant_action(&mut self) -> Result<i32, i32> {
-        if self.0 <= 2 {
+        if self.0 >= 2 {
             self.0 -= 2;
             Ok(self.0)
         } else {
@@ -129,7 +143,7 @@ impl ActionPoints {
     }
     ///Reduces the action points by the 1AP that a minor action costs
     pub fn minor_action(&mut self) -> Result<i32, i32> {
-        if self.0 <= 1 {
+        if self.0 >= 1 {
             self.0 -= 1;
             Ok(self.0)
         } else {

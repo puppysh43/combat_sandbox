@@ -6,14 +6,26 @@ use hecs::*;
 use macroquad::prelude::*;
 
 pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
+    //command buffer so we can push log messages w/out fucking w/ the borrow checker as much
+    let mut cmd_buf = CommandBuffer::new();
     //first check with the combat encounter to see which entity/character is being currently controlled
     let active_entity = combat_encounter.next_turn().unwrap();
+    /*
+    cmd_buf.spawn((DebugLogMessage::new(format!(
+        "Current Active Entity ID: {:?}",
+        active_entity
+    )),));*/
+
     //make an option to hold the queried action points
     let mut action_points_query: Option<ActionPoints> = None;
     for ap in state.ecs.query_one_mut::<&ActionPoints>(active_entity) {
         action_points_query = Some(*ap);
     }
     let mut action_points = action_points_query.unwrap();
+    /*
+    blank template for pushing a debug/log message
+    cmd_buf.spawn((DebugLogMessage::new(String::from("")),));
+    */
 
     match state.control_state {
         CombatActionType::None => {
@@ -22,14 +34,18 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
                 match action_points.significant_action() {
                     Ok(ap_left) => {
                         state.control_state = CombatActionType::RangedAttack;
-                        println!(
+                        println!();
+                        cmd_buf.spawn((GameLogMessage::new(format!(
                             "[Entity Name] has decided to attack and now has {} AP left!",
                             ap_left
-                        );
+                        )),));
                         //spawn in a reticule
                     }
                     Err(ap_left) => {
-                        println!("[Entity Name] doesn't have enough action points to make a ranged attack, only has {} AP!", ap_left);
+                        cmd_buf.spawn((GameLogMessage::new(format!(
+                            "[Entity Name] doesn't have enough action points to make a ranged attack, only has {} AP!",
+                            ap_left
+                        )),));
                     }
                 }
             }
@@ -58,14 +74,20 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
             }
             //choose to start moving
             if is_key_pressed(KeyCode::S) {
+                cmd_buf.spawn((DebugLogMessage::new(String::from("S Key has been pressed")),));
                 match action_points.minor_action() {
                     Ok(ap_left) => {
+                        cmd_buf.spawn((GameLogMessage::new(format!(
+                            "[Entity Name] has decided to move and now has {} AP left!",
+                            ap_left
+                        )),));
                         state.control_state = CombatActionType::Movement;
-
-                        println!("character has decided to move");
                     }
                     Err(ap_left) => {
-                        //
+                        cmd_buf.spawn((DebugLogMessage::new(format!(
+                            "[Entity Name] has decided to move but doesn't have enough AP, with only {} points", 
+                            ap_left
+                        )),));
                     }
                 }
             }
@@ -155,12 +177,20 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
             //use y or n to confirm or deny if the player actually wants to end turn.
             if is_key_pressed(KeyCode::Y) {
                 state.ecs.spawn((MOIEndTurn,));
+                state.control_state = CombatActionType::None;
             }
             if is_key_pressed(KeyCode::N) {
                 state.control_state = CombatActionType::None;
             }
         }
     }
+    //add all the buffered log statements to the ECS so they actually show up
+    cmd_buf.run_on(&mut state.ecs);
+    //update the action points of the current active entity so that the deductions in action points actually happen
+    state
+        .ecs
+        .insert_one(active_entity, action_points)
+        .expect("Failed to update action points of active entity.");
 }
 
 ///generic function for getting a delta from user keypresses, either for selecting a direction
