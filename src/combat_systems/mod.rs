@@ -3,6 +3,7 @@ mod input;
 mod logs;
 mod movement;
 mod render;
+mod render_ui;
 
 use crate::prelude::*;
 use hecs::*;
@@ -25,6 +26,7 @@ pub fn run(state: &mut GameState) {
     //then render the gamestate onto the screen
     logs::system(state);
     render::system(state);
+    render_ui::system(state);
     update_combat_encounter(state, combat_encounter);
 }
 ///Helper function that returns the current Combat Encounter in the ECS

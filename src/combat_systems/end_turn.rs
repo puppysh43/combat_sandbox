@@ -19,12 +19,8 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
         state
             .ecs
             .spawn((DebugLogMessage::new(String::from("completing entity turn")),));
-        let mut round_has_completed = false;
-        let mut entities_in_combat: Vec<Entity> = Vec::new();
-        for (_id, combat_encounter) in state.ecs.query_mut::<&mut CombatEncounter>() {
-            round_has_completed = combat_encounter.complete_turn();
-            entities_in_combat = combat_encounter.get_all_entities();
-        }
+        let round_has_completed = combat_encounter.complete_turn();
+        let entities_in_combat = combat_encounter.get_all_entities();
         if round_has_completed {
             //if the round has completed then refresh the AP of all entities in the combat encounter
             for entity in entities_in_combat.iter() {

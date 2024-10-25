@@ -236,6 +236,3 @@ fn get_delta() -> Option<IVec2> {
         None
     }
 }
-
-fn move_with_collision(state: &mut GameState, entity_to_move: Entity) {}
-fn move_without_collision(state: &mut GameState, entity_to_move: Entity) {}
