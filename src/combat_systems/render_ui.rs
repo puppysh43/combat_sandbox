@@ -11,7 +11,7 @@ pub fn system(state: &mut GameState) {
     let ui_x_start: f32 = gamescreen_edge + divider_width;
     let ui_top_y_offset: f32 = 5.0;
     let text_height = measure_text("A", None, 20, 1.0).height;
-    println!("text height: {}", text_height);
+    // println!("text height: {}", text_height);
     draw_line(
         (gamescreen_edge + (divider_width / 2.0)),
         0.0,

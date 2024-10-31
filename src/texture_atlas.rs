@@ -26,6 +26,9 @@ pub async fn make() -> TextureAtlas {
     let down_arrow = load_texture("textures/down_arrow.png")
         .await
         .expect("Failed to load texture.");
+    let default_reticule = load_texture("textures/default_reticule.png")
+        .await
+        .expect("Failed to load texture.");
     let texture_atlas = HashMap::from([
         (String::from("character"), default_character),
         (String::from("floor"), default_floor),
@@ -34,6 +37,7 @@ pub async fn make() -> TextureAtlas {
         (String::from("quarter cover"), default_quartercover),
         (String::from("wall"), default_wall),
         (String::from("down arrow"), down_arrow),
+        (String::from("reticule"), default_reticule),
     ]);
     build_textures_atlas();
     return texture_atlas;

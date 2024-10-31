@@ -39,7 +39,9 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
                             "[Entity Name] has decided to attack and now has {} AP left!",
                             ap_left
                         )),));
-                        //spawn in a reticule
+                        //TODO spawn in a reticule
+                        let active_pos = get_pos(&mut state.ecs, active_entity);
+                        spawn_reticule(&mut state.ecs, active_pos, active_entity);
                     }
                     Err(ap_left) => {
                         cmd_buf.spawn((GameLogMessage::new(format!(
@@ -66,6 +68,8 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
                     Ok(ap_left) => {
                         state.control_state = CombatActionType::Aiming;
                         //spawn in a reticule
+                        let active_pos = get_pos(&mut state.ecs, active_entity);
+                        spawn_reticule(&mut state.ecs, active_pos, active_entity);
                     }
                     Err(ap_left) => {
                         //
@@ -173,6 +177,9 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
         CombatActionType::PickUp => {
             //this one also may not need to be its own control state we shall see
         }
+        CombatActionType::ReactionSelection => {
+            //
+        }
         CombatActionType::EndTurn => {
             //use y or n to confirm or deny if the player actually wants to end turn.
             if is_key_pressed(KeyCode::Y) {
@@ -235,4 +242,22 @@ fn get_delta() -> Option<IVec2> {
     } else {
         None
     }
+}
+
+///returns the position of the entity fed to it
+fn get_pos(ecs: &mut World, entity: Entity) -> IVec2 {
+    let mut pos: Option<IVec2> = None;
+    if let Ok(query_pos) = ecs.query_one_mut::<&IVec2>(entity) {
+        pos = Some(*query_pos);
+    }
+    pos.expect("entity does not have a position conmponent.")
+}
+
+fn spawn_reticule(ecs: &mut World, pos: IVec2, entity: Entity) {
+    ecs.spawn((
+        Reticule::new(entity),
+        pos,
+        Renderable::new(String::from("reticule")),
+        Effect,
+    ));
 }

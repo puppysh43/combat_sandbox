@@ -41,6 +41,7 @@ fn render_map(state: &mut GameState) {
 }
 
 fn render_entities(state: &mut GameState) {
+    //this block renders all characters
     for (_id, (sprite_id, pos, ctrl_type)) in
         state.ecs.query_mut::<(&Renderable, &IVec2, &ControlType)>()
     {
@@ -54,6 +55,31 @@ fn render_entities(state: &mut GameState) {
             (pos.x * TILE_WIDTH) as f32,
             (pos.y * TILE_HEIGHT) as f32,
             color,
+        );
+    }
+    //this block will render all non character props and objects
+    /*
+    for (_id, (sprite_id, pos)) in state
+        .ecs
+        .query_mut::<Without<(&Renderable, &IVec2), (&Effect, &ControlType)>>()
+    {
+        draw_texture(
+            state.texture_atlas.get(&sprite_id.get_sprite()).unwrap(),
+            (pos.x * TILE_WIDTH) as f32,
+            (pos.y * TILE_HEIGHT) as f32,
+            WHITE,
+        );
+    }*/
+    //this block renders effects
+    for (_id, (sprite_id, pos)) in state
+        .ecs
+        .query_mut::<With<(&Renderable, &IVec2), &Effect>>()
+    {
+        draw_texture(
+            state.texture_atlas.get(&sprite_id.get_sprite()).unwrap(),
+            (pos.x * TILE_WIDTH) as f32,
+            (pos.y * TILE_HEIGHT) as f32,
+            WHITE,
         );
     }
 }

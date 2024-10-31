@@ -33,4 +33,27 @@ impl MOIWantsToMove {
     }
 }
 ///Simple message component for communicating that the current character wants to end their turn
+#[derive(Copy, Clone, Debug)]
 pub struct MOIEndTurn;
+
+#[derive(Copy, Clone, Debug)]
+///Ranged Attack MOI used when a character is first selecting a target before
+///the target has had a chance to select a reaction
+pub struct MOIRangedAttackStageOne {
+    shooter: Entity,
+    target: Entity,
+}
+
+#[derive(Copy, Clone, Debug)]
+pub enum RangedReactionType {
+    Dodging,
+    DivingForCover,
+    None,
+}
+
+#[derive(Copy, Clone, Debug)]
+pub struct MOIRangedAttackStageTwo {
+    shooter: Entity,
+    target: Entity,
+    reaction: RangedReactionType,
+}

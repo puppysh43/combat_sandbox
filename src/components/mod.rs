@@ -11,6 +11,12 @@ use macroquad::prelude::*;
 
 ///tag component to mark an entity as a reticule owned by a particular character
 pub struct Reticule(Entity);
+impl Reticule {
+    pub fn new(entity: Entity) -> Self {
+        Self(entity)
+    }
+}
+pub struct Effect;
 ///Component that allows an entity to be rendered, contains the hashmap key needed to retrieve
 ///the necessary Texture2D from the texture atlas
 #[derive(Clone, Debug)]

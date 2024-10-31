@@ -37,6 +37,8 @@ pub enum CombatActionType {
     PickUp,
     ///Control for when a player wants to end their turn.
     EndTurn,
+    ///control state for when a player is selecting a reaction to make in response to an attack
+    ReactionSelection,
 }
 
 #[derive(Copy, Clone, Debug, PartialEq)]
