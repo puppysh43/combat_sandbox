@@ -111,6 +111,40 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
         }
         CombatActionType::RangedAttack => {
             //ranged attack code goes here [move reticule MOI or send ranged attack MOI]
+            //let the player cancel a ranged attack
+            if is_key_pressed(KeyCode::Escape) {
+                state.control_state = CombatActionType::None;
+                //maybe restore AP?
+            }
+            if is_key_pressed(KeyCode::Enter)
+                || is_key_pressed(KeyCode::KpEnter)
+                || is_key_pressed(KeyCode::Space)
+            {
+                //get reticule entity id necessary for running logic
+                let reticule_id = get_reticule(&mut state.ecs);
+                //get reticule position
+                let reticule_pos = get_pos(&mut state.ecs, reticule_id);
+                //make the ranged attack
+                make_ranged_attack(state, reticule_pos);
+                //need to check where the reticule is to see if there's a target
+                //check line of sight, if the reticule is even on an entity, etc
+                //then check if any map tiles can be damaged
+                //then draw stuff I guess. idk
+            }
+            let delta = get_delta();
+            if delta.is_some() {
+                //get reticule entity id necessary for running logic
+                let reticule_id = get_reticule(&mut state.ecs);
+                //get reticule position
+                let reticule_pos = get_pos(&mut state.ecs, reticule_id);
+                let delta = delta.unwrap();
+                //create a movement moi
+                state.ecs.spawn((MOIWantsToMove::new(
+                    false,
+                    reticule_id,
+                    IVec2::new(reticule_pos.x + delta.x, reticule_pos.y + delta.y),
+                ),));
+            }
         }
         CombatActionType::MeleeAttack => {
             //melee attack code goes here
@@ -136,22 +170,13 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
             }
             let delta = get_delta();
             if delta.is_some() {
-                let mut pos: Option<IVec2> = None;
-                for query_pos in state.ecs.query_one_mut::<&IVec2>(active_entity) {
-                    pos = Some(*query_pos);
-                }
+                let delta = delta.unwrap();
+                let pos = get_pos(&mut state.ecs, active_entity);
                 state.ecs.spawn((MOIWantsToMove::new(
                     true,
                     active_entity,
-                    IVec2::new(
-                        pos.unwrap().x + delta.unwrap().x,
-                        pos.unwrap().y + delta.unwrap().y,
-                    ),
+                    IVec2::new(pos.x + delta.x, pos.y + delta.y),
                 ),));
-            }
-            //esc is used to stop moving when the user is done
-            if is_key_pressed(KeyCode::Escape) {
-                state.control_state = CombatActionType::None;
             }
         }
         CombatActionType::Grapple => {
@@ -260,4 +285,28 @@ fn spawn_reticule(ecs: &mut World, pos: IVec2, entity: Entity) {
         Renderable::new(String::from("reticule")),
         Effect,
     ));
+}
+
+fn get_reticule(ecs: &mut World) -> Entity {
+    let mut reticule_id: Option<Entity> = None;
+    for (id, _reticule) in ecs.query_mut::<&Reticule>() {
+        reticule_id = Some(id);
+    }
+    reticule_id.expect("There is no reticule!")
+}
+
+fn make_ranged_attack(state: &mut GameState, reticule_pos: IVec2) {
+    //need to check where the reticule is to see if there's a target
+    //check line of sight, if the reticule is even on an entity, etc
+    //then check if any map tiles can be damaged
+    //then draw stuff I guess. idk
+
+    //first check if there's an entity at the same position as the reticule
+    let mut targeted_entity: Option<Entity> = None;
+    for (id, pos) in state.ecs.query_mut::<Without<&IVec2, &Effect>>() {
+        if *pos == reticule_pos {
+            targeted_entity = Some(id);
+        }
+    }
+    //then check line of sight
 }
