@@ -2,6 +2,7 @@ mod end_turn;
 mod input;
 mod logs;
 mod movement;
+mod ranged_attacks;
 mod render;
 mod render_ui;
 
@@ -22,6 +23,7 @@ pub fn run(state: &mut GameState) {
     input::system(state, &mut combat_encounter);
     //then process those MOIs and do other systems
     movement::system(state);
+    ranged_attacks::system(state);
     end_turn::system(state, &mut combat_encounter);
     //then render the gamestate onto the screen
     logs::system(state);

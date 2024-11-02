@@ -39,9 +39,14 @@ pub struct MOIEndTurn;
 #[derive(Copy, Clone, Debug)]
 ///Ranged Attack MOI used when a character is first selecting a target before
 ///the target has had a chance to select a reaction
-pub struct MOIRangedAttackStageOne {
-    shooter: Entity,
-    target: Entity,
+pub struct MOIRangedAttack {
+    pub shooter: Entity,
+    pub target: Entity,
+}
+impl MOIRangedAttack {
+    pub fn new(shooter: Entity, target: Entity) -> Self {
+        Self { shooter, target }
+    }
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -52,7 +57,7 @@ pub enum RangedReactionType {
 }
 
 #[derive(Copy, Clone, Debug)]
-pub struct MOIRangedAttackStageTwo {
+pub struct MOIRangedAttackWithReaction {
     shooter: Entity,
     target: Entity,
     reaction: RangedReactionType,

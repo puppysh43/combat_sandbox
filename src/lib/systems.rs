@@ -3,6 +3,7 @@ This module contains all the helper functions for the game systems
 */
 use crate::prelude::*;
 use hecs::*;
+use macroquad::math::*;
 use macroquad::rand;
 
 pub fn calculate_initiative(state: &mut GameState) {
@@ -90,4 +91,50 @@ pub fn roll_3d6(boon_or_bane: BoonOrBane) -> i32 {
         BoonOrBane::Bane => raw_roll.iter().sum::<i32>() - raw_roll.iter().max().unwrap(),
         BoonOrBane::Boon => raw_roll.iter().sum::<i32>() - raw_roll.iter().min().unwrap(),
     }
+}
+
+///Implementation of Bresenham's Line Algorithm
+pub fn get_line(a: IVec2, b: IVec2) -> Vec<IVec2> {
+    let mut points = Vec::<IVec2>::new();
+    let (mut x1, mut y1, mut x2, mut y2) = (a.x, a.y, b.x, b.y);
+    let is_steep = (y2 - y1).abs() > (x2 - x1).abs();
+    if is_steep {
+        std::mem::swap(&mut x1, &mut y1);
+        std::mem::swap(&mut x2, &mut y2);
+    }
+    let mut reversed = false;
+    if x1 > x2 {
+        std::mem::swap(&mut x1, &mut x2);
+        std::mem::swap(&mut y1, &mut y2);
+        reversed = true;
+    }
+    let dx = x2 - x1;
+    let dy = (y2 - y1).abs();
+    let mut err = dx / 2;
+    let mut y = y1;
+    let ystep: i32;
+    if y1 < y2 {
+        ystep = 1;
+    } else {
+        ystep = -1;
+    }
+    for x in x1..(x2 + 1) {
+        if is_steep {
+            points.push(IVec2::new(y, x));
+        } else {
+            points.push(IVec2::new(x, y));
+        }
+        err -= dy;
+        if err < 0 {
+            y += ystep;
+            err += dx;
+        }
+    }
+    if reversed {
+        for i in 0..(points.len() / 2) {
+            let end = points.len() - 1;
+            points.swap(i, end - i);
+        }
+    }
+    points
 }

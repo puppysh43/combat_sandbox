@@ -1,6 +1,7 @@
 use super::CombatEncounter;
 use crate::combat_action_type::*;
 use crate::gamestate::*;
+use crate::map::TileType;
 use crate::prelude::*;
 use hecs::*;
 use macroquad::prelude::*;
@@ -125,11 +126,8 @@ pub fn system(state: &mut GameState, combat_encounter: &mut CombatEncounter) {
                 //get reticule position
                 let reticule_pos = get_pos(&mut state.ecs, reticule_id);
                 //make the ranged attack
-                make_ranged_attack(state, reticule_pos);
-                //need to check where the reticule is to see if there's a target
-                //check line of sight, if the reticule is even on an entity, etc
-                //then check if any map tiles can be damaged
-                //then draw stuff I guess. idk
+                make_ranged_attack(state, reticule_pos, active_entity);
+                //also print something to the log about an attack being made.
             }
             let delta = get_delta();
             if delta.is_some() {
@@ -295,12 +293,7 @@ fn get_reticule(ecs: &mut World) -> Entity {
     reticule_id.expect("There is no reticule!")
 }
 
-fn make_ranged_attack(state: &mut GameState, reticule_pos: IVec2) {
-    //need to check where the reticule is to see if there's a target
-    //check line of sight, if the reticule is even on an entity, etc
-    //then check if any map tiles can be damaged
-    //then draw stuff I guess. idk
-
+fn make_ranged_attack(state: &mut GameState, reticule_pos: IVec2, shooter: Entity) {
     //first check if there's an entity at the same position as the reticule
     let mut targeted_entity: Option<Entity> = None;
     for (id, pos) in state.ecs.query_mut::<Without<&IVec2, &Effect>>() {
@@ -309,4 +302,39 @@ fn make_ranged_attack(state: &mut GameState, reticule_pos: IVec2) {
         }
     }
     //then check line of sight
+    let shooter_pos = get_pos(&mut state.ecs, shooter);
+    //get a line of points on the map to check for any obstacles.
+    let line_of_sight = crate::lib::systems::get_line(shooter_pos, reticule_pos);
+    //then we need to check if there's anything else that could be hit within the line of sight
+    //first check for other entities in the way. for now we instead roll the attack roll against any other characters in the way
+    for (id, pos) in state.ecs.query_mut::<Without<&IVec2, &Effect>>() {
+        //iterate through in reverse b/c we're going to overwrite the targeted entity as we go, so we wanna make sure
+        //that we don't accidentally make the shooter target something just in front of their target when there's something
+        //else in the way that's even closer!
+        for los_pos in line_of_sight.iter().rev() {
+            if los_pos == pos {
+                targeted_entity = Some(id);
+            }
+        }
+    }
+    //then we're gonna check for any map tiles in the way. for now this will just prevent an attack from taking place, but in the future there's
+    //gonna be some kind of like environmental destruction perhaps. (probably not but we'll see)
+    for los_pos in line_of_sight.iter().rev() {
+        match state.map.tiles[crate::map::map_idx(los_pos.x, los_pos.y)] {
+            TileType::Wall => {
+                //right now we're just gonna overwrite the targeted entity to none to cancel the attack
+                //but in the future this will effect where the gunshot animation goes and what sound it makes and all that jazz
+                targeted_entity = None;
+            }
+            _ => {
+                //do nothing
+            }
+        }
+    }
+    //finally if there is a targeted entity still push the MOI out into the world to be processed later
+    if targeted_entity.is_some() {
+        state
+            .ecs
+            .spawn((MOIRangedAttack::new(shooter, targeted_entity.unwrap()),));
+    }
 }
