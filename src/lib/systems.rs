@@ -138,3 +138,29 @@ pub fn get_line(a: IVec2, b: IVec2) -> Vec<IVec2> {
     }
     points
 }
+
+pub fn get_adjacent(pos: IVec2) -> Vec<IVec2> {
+    //make a vec of all possible points around the given pos
+    let deltas = vec![
+        IVec2::new(-1, 0),
+        IVec2::new(0, -1),
+        IVec2::new(1, 0),
+        IVec2::new(0, 1),
+        IVec2::new(-1, -1),
+        IVec2::new(1, 1),
+        IVec2::new(-1, 1),
+        IVec2::new(1, -1),
+    ];
+    let mut adjacent_tiles: Vec<IVec2> = Vec::new();
+    for delta in deltas.iter() {
+        let possible_pos = IVec2::new(pos.x + delta.x, pos.y + delta.y);
+        if possible_pos.x.is_positive()
+            && possible_pos.y.is_positive()
+            && possible_pos.x < MAP_WIDTH
+            && possible_pos.y < MAP_HEIGHT
+        {
+            adjacent_tiles.push(possible_pos);
+        }
+    }
+    adjacent_tiles
+}

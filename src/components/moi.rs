@@ -58,7 +58,7 @@ pub enum RangedReactionType {
 
 #[derive(Copy, Clone, Debug)]
 pub struct MOIRangedAttackWithReaction {
-    shooter: Entity,
-    target: Entity,
-    reaction: RangedReactionType,
+    pub shooter: Entity,
+    pub target: Entity,
+    pub reaction: RangedReactionType,
 }

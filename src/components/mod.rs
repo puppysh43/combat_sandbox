@@ -199,7 +199,7 @@ pub enum Stance {
     Crouched,
     Prone,
 }
-
+#[derive(Copy, Clone, Debug)]
 ///tag component that points to a weapon and marks it as equipped by an entity that has this component
 pub struct EquippedRangedWeapon(Entity);
 

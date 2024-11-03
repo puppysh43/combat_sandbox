@@ -273,7 +273,7 @@ fn get_pos(ecs: &mut World, entity: Entity) -> IVec2 {
     if let Ok(query_pos) = ecs.query_one_mut::<&IVec2>(entity) {
         pos = Some(*query_pos);
     }
-    pos.expect("entity does not have a position conmponent.")
+    pos.expect("entity does not have a position component.")
 }
 
 fn spawn_reticule(ecs: &mut World, pos: IVec2, entity: Entity) {
@@ -301,6 +301,10 @@ fn make_ranged_attack(state: &mut GameState, reticule_pos: IVec2, shooter: Entit
             targeted_entity = Some(id);
         }
     }
+
+    //DO A SANITY CHECK FOR AN EQUIPPED RANGED WEAPON
+    //as well as enough ammo
+
     //then check line of sight
     let shooter_pos = get_pos(&mut state.ecs, shooter);
     //get a line of points on the map to check for any obstacles.
