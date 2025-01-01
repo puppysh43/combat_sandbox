@@ -63,27 +63,30 @@ pub enum WeaponTrait {
 
 ///Enum for identifying what skill is used for the attack roll of a weapon
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
-pub enum WeaponType {
-    MeleeUnarmed,
-    MeleeBlades,
-    MeleeBludgeoning,
+pub enum RangedWeaponType {
+    // MeleeUnarmed,
+    // MeleeBlades,
+    // MeleeBludgeoning,
     RangedOneHanded,
     RangedTwoHanded,
     HeavyWeaponsArtillery,
     HeavyWeaponsPortable,
     HeavyWeaponsVehicle,
-    Thrown, //for thrown weapons Athletics(dexterity) is used
+    // Thrown, //for thrown weapons Athletics(dexterity) is used
 }
 
+///Enum for identifying how many hands are needed to use the weapon and how many slots
+///will be occupied when its equipped
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum WeaponSize {
     OneHanded,
     TwoHanded,
 }
 
-///Contains all the data necessary for a weapon to be interacted with
-pub struct Weapon {
+///
+pub struct RangedWeapon {
     ///attack type used for determining both rules interactions and what animations will play
-    attack_type: WeaponType,
+    weapon_type: RangedWeaponType,
     ///how many hands a weapon uses
     size: WeaponSize,
     ///range is in meters
@@ -96,9 +99,51 @@ pub struct Weapon {
     cost: i32,
     ///magazine size represented as an i32. note that current ammo will be stored as a separate component
     magazine: i32,
-    //magazine_cost: i32,
+    ///how much ammo is currently loaded in the weapon's magazine
+    current_ammo: i32,
+    ///the weapon's traits
+    traits: Vec<WeaponTrait>,
 }
-
-///Component for when a weapon is loaded with ammo
-pub struct CurrentAmmo(i32);
-impl CurrentAmmo {}
+impl RangedWeapon {
+    pub fn new(
+        weapon_type: RangedWeaponType,
+        size: WeaponSize,
+        range: i32,
+        damage: String,
+        kg: f32,
+        cost: i32,
+        magazine: i32,
+        current_ammo: i32,
+        traits: Vec<WeaponTrait>,
+    ) -> Self {
+        Self {
+            weapon_type,
+            size,
+            range,
+            damage,
+            kg,
+            cost,
+            magazine,
+            current_ammo,
+            traits,
+        }
+    }
+    //function for reloading a weapon that sets the current ammo to the magazine size
+    //and returns how much ammo was added to the magazine
+    pub fn reload(&mut self) -> i32 {
+        let ammo_used = self.magazine - self.current_ammo;
+        self.current_ammo = self.magazine;
+        ammo_used
+    }
+    ///right now this simply decrements the current ammo in the future will take an attack
+    ///type enum and also check for any relevant traits
+    ///returns how much ammunition was used
+    pub fn use_ammo(&mut self) -> i32 {
+        self.current_ammo -= 1;
+        if self.current_ammo.is_negative() {
+            self.current_ammo = 0;
+            return 0;
+        }
+        return 1;
+    }
+}

@@ -44,10 +44,13 @@ pub fn system(state: &mut GameState) {
     //
     for moi in attacks_with_reactions.iter() {
         let (shooter, target, reaction) = (moi.shooter, moi.target, moi.reaction);
-
+        let shooter_weapon = state.ecs.query_one_mut
         //here is where the actual attack roll gets fully processed
 
         //depending on the attack deplete the ammo a certain amount
+        let mut shots_made = 1; //currently this is just 1 but later this will match
+                                //according to attack type
+
 
         //get the attacker's equipped weapon to check for any attack roll
 
